@@ -23,8 +23,9 @@ app.get('/admin', (req, res) => {
 })
 
 app.post('/admin', async (req, res) => {
-    const { firstname, lastname, email, password, department, position } = req.body;
+    const { firstname, lastname, email, password, department, position , company} = req.body;
     // console.log(firstname);
+
     try {
 
         const A = await User.create({
@@ -37,7 +38,7 @@ app.post('/admin', async (req, res) => {
 
 
         })
-        console.log(A)
+        console.log(A.data)
     } catch (err) {
         if (err) {
             return res.render('administration', {
@@ -46,7 +47,13 @@ app.post('/admin', async (req, res) => {
         }
 
     }
-
+    const b = await Company.findOne({
+        raw:true,
+        where:{
+            name:company
+        }
+    });
+    console.log(b.id);
 })
 
 app.get('/company', (req, res) => {
