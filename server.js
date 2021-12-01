@@ -35,13 +35,13 @@ app.post('/admin', async (req, res) => {
             position,
             password
 
-
         })
         console.log(A)
     } catch (err) {
         if (err) {
             return res.render('administration', {
-                errortext: err.message
+                errortext: err.message,
+                id:A.id
             })
         }
 
