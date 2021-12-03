@@ -84,3 +84,12 @@ body {
             line-height: 29px;
             font-weight:bold;
         }}
+
+  .navbar{
+    margin-bottom: 50px;
+  }
+
+  .register{
+    padding: 30px 10px;
+    
+  }

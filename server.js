@@ -19,11 +19,11 @@ app.get('/', (req, res) => {
     res.render("login");
 })
 
-app.get('/admin', (req, res) => {
+app.get('/adduser', (req, res) => {
     res.render('administration');
 })
 
-app.post('/admin', async (req, res) => {
+app.post('/adduser', async (req, res) => {
     const { firstname, lastname, email, password, department, position , company} = req.body;
     // console.log(firstname);
 
@@ -48,7 +48,8 @@ app.post('/admin', async (req, res) => {
     } catch (err) {
         if (err) {
             return res.render('administration', {
-                errortext: err.message
+                errortext: err.message,
+                ...req.body
             })
         }
 
@@ -65,6 +66,7 @@ app.post('/admin', async (req, res) => {
         UserId:us.dataValues.id,
         CompanyId:b.id
     })
+    res.render('administration')
 })
 
 app.get('/company', (req, res) => {
@@ -86,19 +88,42 @@ app.post('/company', async (req, res) => {
 
 })
 
-app.get('/users', (req, res)=>{
-     res.render('users');
+app.get('/users', async (req, res)=>{
+    const companies= await Company.findAll({
+        raw:true
+    })
+    console.log(companies);
+     res.render('users', {
+         companies
+     });
 })
 
 app.post('/users', async (req, res)=>{
     const {company} = req.body;
+    try{
+
     const result = await Company.findOne({
         where: { name: company},
         include: User   
       });
-    //   console.log(result.dataValues.id);
-    console.log(result.Users)
+      console.log(result);
+      console.log(result.Users);
+    const q = JSON.parse(JSON.stringify(result.Users));
+    
+    console.log(q);
+    // console.log(q[0].firstname)
+    res.render('users', {
+        q
+    })
+}catch(err){
+    res.redirect('/users');
+}
+
+})
+
+app.get('/addfile', (req, res)=>{
+    res.render('addfile');
 })
 app.listen(5001, () => {
     console.log("server dinleyir");
-})
+})  
