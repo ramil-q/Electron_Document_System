@@ -1,14 +1,15 @@
 const express = require('express');
 const { engine } = require("express-handlebars");
 const app = express();
-const { User, Company } = require('./models')
+const { User, Company,user_company} = require('./models');
+const company = require('./models/company');
 app.engine("handlebars", engine({
     defaultLayout: 'main'
 }));
 
 app.set('view engine', 'handlebars');
 
-app.use(express.urlencoded({
+app.use(express.urlencoded({    
     extended: true
 }));
 app.use(express.json());
@@ -28,16 +29,21 @@ app.post('/admin', async (req, res) => {
 
     try {
 
-        const A = await User.create({
+        var us = await User.create({
             firstname,
             lastname,
-            email,
+            email,  
             department,
             position,
             password
 
         })
-        console.log(A.data)
+        // console.log(us.dataValues.id);
+        // const comp = await Company.create({
+        //     name: company
+        // })
+        // await us.addProfile(comp, { through: { selfGranted: false } });
+       
     } catch (err) {
         if (err) {
             return res.render('administration', {
@@ -47,18 +53,24 @@ app.post('/admin', async (req, res) => {
         }
 
     }
-    const b = await Company.findOne({
+    var b = await Company.findOne({
         raw:true,
         where:{
             name:company
         }
     });
-    console.log(b.id);
+    // console.log(b);
+
+    await user_company.create({
+        UserId:us.dataValues.id,
+        CompanyId:b.id
+    })
 })
 
 app.get('/company', (req, res) => {
     res.render('company')
 })
+
 
 app.post('/company', async (req, res) => {
     const { company } = req.body
@@ -72,6 +84,20 @@ app.post('/company', async (req, res) => {
         console.log(err)
     }
 
+})
+
+app.get('/users', (req, res)=>{
+     res.render('users');
+})
+
+app.post('/users', async (req, res)=>{
+    const {company} = req.body;
+    const result = await Company.findOne({
+        where: { name: company},
+        include: User   
+      });
+    //   console.log(result.dataValues.id);
+    console.log(result.Users)
 })
 app.listen(5001, () => {
     console.log("server dinleyir");
